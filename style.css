@@ -98,20 +98,34 @@ body {
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
+    /* 1. & 2. Print effect & Boundry protection */
+    filter: url(#print-texture);
+    max-width: 80%; 
+    white-space: nowrap; 
+    margin: 0 auto;
 }
 
 .player-number-display {
     font-size: 5rem;
     font-weight: 900;
-    margin: -20px;
+    margin: -30px auto;
     background: linear-gradient(180deg, #fcd784, #cc9027);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
+    /* 1. & 2. Print effect & Boundry protection */
+    filter: url(#print-texture);
+    max-width: 80%; 
+    white-space: nowrap; 
 }
 
 .shirt-qr { width: 60px; margin: 10px 0; }
 .promo-text { font-size: 0.7rem; font-weight: 900; color: #fcd784; }
+
+/* 3. New Shirt Text Styling */
+.shirt-divider { width: 20%; border: 0; height: 1px; background: rgba(252, 215, 132, 0.4); margin: 5px auto; }
+.shirt-edition-text { color: #fcd784; font-size: 0.55rem; font-weight: 800; margin-top: 2px;}
+.shirt-limited-text { color: #999898; font-size: 0.45rem; font-weight: 700; margin-top: 2px;}
 
 /* Flip Button Styling */
 #btn-flip {
@@ -133,8 +147,6 @@ body {
     background: #cc9027;
 }
 
-
-
 /* --- Right Column (Form) --- */
 .form-container {
     width: 100%;
@@ -145,27 +157,27 @@ body {
     box-shadow: 0 10px 30px rgba(0,0,0,0.5);
 }
 
-.gradient-title { font-size: 1.5rem; font-weight: 900; text-align: center; margin-bottom: 10px; }
+/* 5. Right side content closer together via reduced margins */
+.gradient-title { font-size: 1.5rem; font-weight: 900; text-align: center; margin-bottom: 5px; }
 .silver-text { background: linear-gradient(180deg, #dfdedd, #999898); -webkit-background-clip: text; color: transparent; }
 .gold-text { background: linear-gradient(180deg, #fcd784, #cc9027); -webkit-background-clip: text; color: transparent; }
 
-.divider { border: 0; height: 1px; background: rgba(255,255,255,0.1); margin: 15px 0; }
+.divider { border: 0; height: 1px; background: rgba(255,255,255,0.1); margin: 8px 0; }
 
 .edition-text { color: #fcd784; font-size: 0.9rem; text-align: center; }
 .limited-text { color: #999898; font-size: 0.8rem; text-align: center; }
 
 /* --- Form Elements --- */
-.form-item { margin-bottom: 15px; }
-
+.form-item { margin-bottom: 8px; }
 
 .form-item label {
     display: inline-block;
-    font-size: 0.7rem;
+    font-size: 1rem;
     font-weight: 800;
-    padding: 5px 10px;
+    padding: 2px 3px;
     background: #252527;
     border-radius: 4px;
-    margin-bottom: 10px;
+    margin-bottom: 4px;
     color: #fcd784;
 }
 
@@ -195,7 +207,23 @@ input[type="text"] {
     border-radius: 4px;
 }
 
-.current-num { font-size: 1.5rem; font-weight: 800; padding: 0 15px; }
+/* 4. Typed Number Input field styling */
+input.current-num { 
+    font-size: 1.5rem; 
+    font-weight: 800; 
+    padding: 0 5px; 
+    width: 60px;
+    text-align: center;
+    background: transparent;
+    border: none;
+    color: white;
+    -moz-appearance: textfield;
+}
+input.current-num::-webkit-outer-spin-button,
+input.current-num::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
 
 .action-buttons button {
     flex: 1;
@@ -213,7 +241,6 @@ input[type="text"] {
 .btn-claim { background-image: url('./image/Claim.png'); }
 
 .footer-banner { width: 100%; max-width: 400px; display: block; margin: 10px auto 0; }
-
 
 /* --- Media Queries (Desktop) --- */
 @media (min-width: 768px) {
