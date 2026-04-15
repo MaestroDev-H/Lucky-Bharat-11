@@ -16,7 +16,7 @@ body {
 /* --- Layout --- */
 .main-container {
     display: flex;
-    flex-direction: column; /* Mobile first */
+    flex-direction: row; /* Mobile first */
     min-height: 100vh;
     background: url('./image/background.png') no-repeat center center/cover;
 }
@@ -24,7 +24,7 @@ body {
 .column {
     flex: 1;
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     justify-content: center;
     align-items: center;
     padding: 20px;
@@ -147,6 +147,7 @@ body {
     background: #cc9027;
 }
 
+
 /* --- Right Column (Form) --- */
 .form-container {
     width: 100%;
@@ -155,6 +156,24 @@ body {
     background: url('./image/right-background.png') no-repeat center center/cover;
     border-radius: 15px;
     box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    
+    /* ADDED: Flexbox to activate gaps and perfectly distribute sections */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 20px; 
+}
+
+/* ADDED: A specific flex container for your inputs so they are evenly spaced */
+.form-content {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+/* --- Form Elements --- */
+.form-item { 
+    margin-bottom: 0; /* CHANGED: Removed the bottom margin. The gap property in .form-content handles this perfectly now */
 }
 
 /* 5. Right side content closer together via reduced margins */
@@ -265,50 +284,46 @@ input[type="text"] {
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.7);
 }
 
-/* --- Media Queries (Desktop) --- */
-@media (min-width: 768px) {
-    .main-container {
-        flex-direction: row;
-        height: 100vh;
-        overflow: hidden;
-    }
-    
-    .player-name-display { font-size: 3rem; }
-    .player-number-display { font-size: 8rem; }
-    .shirt-qr { width: 80px; }
-    
-    .display-stage {
-        max-width: 90%;
-        height: 90%;
-    }
-
-    .form-container {
-        height: 90vh;
-        justify-content: space-between;
-        display: flex;
-        flex-direction: column;
-    }
-}
-
 /* =========================================
    1. MOBILE RESPONSIVENESS FIXES
    ========================================= */
 @media (max-width: 767px) {
     .main-container {
-        height: auto; /* Allows natural scrolling on mobile */
+        height: auto;
+    display: flex;
+    flex-direction: column; /* Allows natural scrolling on mobile */
     }
     .left-col {
         min-height: 480px; /* Ensures the jersey has enough height to render */
         padding-bottom: 0;
     }
     .display-stage {
-        margin-bottom: 0; /* Removes the desktop negative margin */
-        background-size: 95%; /* Fits the light podium better on small screens */
+        margin-bottom: -40px; /* Removes the desktop negative margin */
+        background-size: 85%; /* Fits the light podium better on small screens */
     }
     .flip-container {
         height: 350px; /* Gives the 3D jersey a stable height on mobile */
-        margin-bottom: 40px; 
+        margin-bottom: 80px; 
     }
+
+    .player-name-display {
+    
+    margin-top: -50px;
+}
+
+.player-number-display {
+   
+    margin: -25px auto;
+  
+   
+}
+
+.shirt-edition-text {
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+}
+
     .right-col {
         padding-top: 10px; /* Brings the form container closer to the jersey */
     }
@@ -316,4 +331,11 @@ input[type="text"] {
         width: 45px; /* Scales down the QR slightly so it doesn't overlap text */
         margin: 25px -20px 0;
     }
+
+.form-container {
+        width: 100%;           /* Reduced from 100% to show edges */
+        margin: 0 auto;       /* Centers the container */
+        background-size: 100% 100%; /* Forces the background image to fit the box exactly */
+    }
+
 }
