@@ -1,0 +1,241 @@
+/* --- Root & Reset --- */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Montserrat', sans-serif;
+}
+
+body {
+    background-color: #000;
+    color: white;
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+/* --- Layout --- */
+.main-container {
+    display: flex;
+    flex-direction: column; /* Mobile first */
+    min-height: 100vh;
+    background: url('./image/background.png') no-repeat center center/cover;
+}
+
+.column {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+/* --- Left Column (Jersey Preview & 3D Stage) --- */
+.display-stage {
+    position: relative;
+    width: 100%; 
+    height: 100%; 
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end; 
+    align-items: center;
+    background: url('./image/Light.png') no-repeat;
+    background-position: center 100%; 
+    background-size: 80%; 
+    margin-bottom: -100px; 
+    perspective: 1000px; /* IMPORTANT: Creates the 3D depth */
+}
+
+/* The rotating container */
+.flip-container {
+    width: 100%;
+    height: 80%;
+    margin-bottom: 130px;
+    position: relative;
+    transition: transform 0.8s cubic-bezier(0.4, 0.2, 0.2, 1);
+    transform-style: preserve-3d;
+}
+
+/* Toggled by JavaScript to spin the container */
+.flip-container.is-flipped {
+    transform: rotateY(180deg);
+}
+
+/* Shared styles for both front and back faces */
+.shirt-face {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+/* Specific to the Back (Starts at 0 degrees, holds the text/QR) */
+.shirt-back {
+    background-image: url('./image/back_image.png');
+    transform: rotateY(0deg); 
+}
+
+/* Specific to the Front (Starts rotated 180 degrees away) */
+.shirt-front {
+    background-image: url('./image/front_image.png'); 
+    transform: rotateY(180deg); 
+}
+
+/* Text and Elements inside the Back Image Area */
+.player-name-display {
+    font-size: 2rem;
+    font-weight: 900;
+    background: linear-gradient(180deg, #fcd784, #cc9027);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.player-number-display {
+    font-size: 5rem;
+    font-weight: 900;
+    margin: -20px;
+    background: linear-gradient(180deg, #fcd784, #cc9027);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.shirt-qr { width: 60px; margin: 10px 0; }
+.promo-text { font-size: 0.7rem; font-weight: 900; color: #fcd784; }
+
+/* Flip Button Styling */
+#btn-flip {
+    position: absolute; 
+    top: 20px; 
+    z-index: 10;
+    padding: 10px 20px;
+    background: #fcd784;
+    color: #000;
+    border: none;
+    font-weight: 900;
+    border-radius: 5px;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+    transition: background 0.3s ease;
+}
+
+#btn-flip:hover {
+    background: #cc9027;
+}
+
+
+
+/* --- Right Column (Form) --- */
+.form-container {
+    width: 100%;
+    max-width: 500px;
+    padding: 25px;
+    background: url('./image/right-background.png') no-repeat center center/cover;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+
+.gradient-title { font-size: 1.5rem; font-weight: 900; text-align: center; margin-bottom: 10px; }
+.silver-text { background: linear-gradient(180deg, #dfdedd, #999898); -webkit-background-clip: text; color: transparent; }
+.gold-text { background: linear-gradient(180deg, #fcd784, #cc9027); -webkit-background-clip: text; color: transparent; }
+
+.divider { border: 0; height: 1px; background: rgba(255,255,255,0.1); margin: 15px 0; }
+
+.edition-text { color: #fcd784; font-size: 0.9rem; text-align: center; }
+.limited-text { color: #999898; font-size: 0.8rem; text-align: center; }
+
+/* --- Form Elements --- */
+.form-item { margin-bottom: 15px; }
+
+
+.form-item label {
+    display: inline-block;
+    font-size: 0.7rem;
+    font-weight: 800;
+    padding: 5px 10px;
+    background: #252527;
+    border-radius: 4px;
+    margin-bottom: 10px;
+    color: #fcd784;
+}
+
+input[type="text"] {
+    width: 100%;
+    padding: 12px;
+    background: #252527;
+    border: 1px solid #615f62;
+    border-radius: 5px;
+    color: white;
+}
+
+.font-options, .counter-box, .action-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.btn-option, .btn-step {
+    padding: 8px 12px;
+    background: #252527;
+    border: 1px solid #615f62;
+    color: white;
+    cursor: pointer;
+    font-size: 0.7rem;
+    font-weight: 700;
+    border-radius: 4px;
+}
+
+.current-num { font-size: 1.5rem; font-weight: 800; padding: 0 15px; }
+
+.action-buttons button {
+    flex: 1;
+    height: 50px;
+    border: none;
+    border-radius: 5px;
+    color: white;
+    font-weight: 900;
+    cursor: pointer;
+    background-size: cover;
+    background-position: center;
+}
+
+.btn-save { background-image: url('./image/save.png'); }
+.btn-claim { background-image: url('./image/Claim.png'); }
+
+.footer-banner { width: 100%; max-width: 400px; display: block; margin: 10px auto 0; }
+
+
+/* --- Media Queries (Desktop) --- */
+@media (min-width: 768px) {
+    .main-container {
+        flex-direction: row;
+        height: 100vh;
+        overflow: hidden;
+    }
+    
+    .player-name-display { font-size: 3rem; }
+    .player-number-display { font-size: 8rem; }
+    .shirt-qr { width: 80px; }
+    
+    .display-stage {
+        max-width: 90%;
+        height: 90%;
+    }
+
+    .form-container {
+        height: 90vh;
+        justify-content: space-between;
+        display: flex;
+        flex-direction: column;
+    }
+}
