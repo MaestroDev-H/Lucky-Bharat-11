@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
 
-    // 2. Helper function to auto-scale text to fit within boundary
+    // Helper function to auto-scale text to fit within boundary
     function autoScaleText(el, baseSizeRem) {
         el.style.fontSize = baseSizeRem + 'rem'; // Reset to base size
         const parentWidth = el.parentElement.offsetWidth;
@@ -15,27 +15,30 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const isDesktop = () => window.innerWidth >= 768;
+    
+    // NEW: We use this to track if a specific font needs to be smaller
+    let currentFontScale = 1.0; 
 
     // --- 1. Update Player Name ---
     const nameInput = document.querySelector('input[placeholder="Type name here..."]');
     const nameDisplay = document.querySelector('.player-name-display');
 
     nameInput.addEventListener('input', (e) => {
-        // Grab the value, trim whitespace, and force uppercase
         const newName = e.target.value.trim().toUpperCase();
-        // Fallback to 'RAHEL' if the input is cleared completely
         nameDisplay.textContent = newName || 'RAHEL'; 
-        autoScaleText(nameDisplay, isDesktop() ? 3 : 2); // Auto-scale after update
+        // Apply the scale modifier to the base size
+        autoScaleText(nameDisplay, (isDesktop() ? 3 : 2) * currentFontScale); 
     });
+
+    
 
 
     // --- 2. Update Player Number ---
     const btnMinus = document.querySelectorAll('.btn-step')[0];
     const btnPlus = document.querySelectorAll('.btn-step')[1];
     const numberDisplay = document.querySelector('.player-number-display');
-    const formNumberInput = document.querySelector('.current-num'); // 4. Now an input field
+    const formNumberInput = document.querySelector('.current-num'); 
 
-    // Initialize state
     let playerNumber = 7;
     formNumberInput.value = playerNumber;
     numberDisplay.textContent = playerNumber;
@@ -43,7 +46,8 @@ document.addEventListener('DOMContentLoaded', () => {
     function updateNumbers() {
         numberDisplay.textContent = playerNumber;
         formNumberInput.value = playerNumber;
-        autoScaleText(numberDisplay, isDesktop() ? 8 : 5); // Auto-scale after update
+        // Apply the scale modifier to the base size
+        autoScaleText(numberDisplay, (isDesktop() ? 8 : 5) * currentFontScale); 
     }
 
     btnMinus.addEventListener('click', () => {
@@ -54,13 +58,12 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     btnPlus.addEventListener('click', () => {
-        if (playerNumber < 999) { // 4. Expanded to 999
+        if (playerNumber < 999) { 
             playerNumber++;
             updateNumbers();
         }
     });
 
-    // 4. Listen for typing directly into the number input box
     formNumberInput.addEventListener('input', (e) => {
         let val = e.target.value.trim();
         playerNumber = val === '' ? '' : parseInt(val, 10);
@@ -71,26 +74,60 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- 3. Change Font Family ---
     const fontButtons = document.querySelectorAll('.font-options .btn-option');
     
-    // Map the button text to the CSS font-family values
-    const fontMap = {
-        'ANTON': "'Anton', sans-serif",
-        'BEBAS': "'Bebas Neue', sans-serif",
-        'VARSITY': "'Varsity', sans-serif", 
-        'MONTSERRAT': "'Montserrat', sans-serif",
-        'IMPACT': "Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif"
+    // Map the button text to specific configurations
+    const fontConfig = {
+        'ANTON': {
+            family: "'Anton', sans-serif",
+            letterSpacing: '1px',
+            numberMargin: '0px',
+            sizeMultiplier: 0.9 // <--- CHANGE THIS: 0.9 makes Anton 10% smaller!
+        },
+        'BEBAS': {
+            family: "'Bebas Neue', sans-serif",
+            letterSpacing: '2px',
+            numberMargin: '-10px',
+            sizeMultiplier: 1.0 // 1.0 means 100% normal size
+        },
+        'VARSITY': {
+            family: "'Varsity', sans-serif",
+            letterSpacing: '1px',
+            numberMargin: '-10px',
+            sizeMultiplier: 1.0
+        },
+        'MONTSERRAT': {
+            family: "'Montserrat', sans-serif",
+            letterSpacing: '0px',
+            numberMargin: '-20px',
+            sizeMultiplier: 1.0
+        },
+        'IMPACT': {
+            family: "Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif",
+            letterSpacing: '0px',
+            numberMargin: '-10px',
+            sizeMultiplier: 1.0
+        }
     };
 
     fontButtons.forEach(button => {
         button.addEventListener('click', () => {
             const selectedFont = button.textContent.trim();
+            const config = fontConfig[selectedFont];
             
-            if (fontMap[selectedFont]) {
-                nameDisplay.style.fontFamily = fontMap[selectedFont];
-                numberDisplay.style.fontFamily = fontMap[selectedFont];
+            if (config) {
+                // Update global font scale based on the selected font
+                currentFontScale = config.sizeMultiplier || 1.0;
+
+                // Apply styles
+                nameDisplay.style.fontFamily = config.family;
+                numberDisplay.style.fontFamily = config.family;
+                nameDisplay.style.letterSpacing = config.letterSpacing;
+                numberDisplay.style.marginTop = config.numberMargin;
+                nameDisplay.style.lineHeight = "1";
+                numberDisplay.style.lineHeight = "1";
                 
-                // Recalculate size since new font might be wider
-                autoScaleText(nameDisplay, isDesktop() ? 3 : 2);
-                autoScaleText(numberDisplay, isDesktop() ? 8 : 5);
+                // Recalculate sizes with the new font scale multiplier
+                autoScaleText(nameDisplay, (isDesktop() ? 3 : 2) * currentFontScale);
+                autoScaleText(numberDisplay, (isDesktop() ? 8 : 5) * currentFontScale);
             }
         });
     });
@@ -103,22 +140,19 @@ document.addEventListener('DOMContentLoaded', () => {
     let isShowingBack = true; 
 
     btnFlip.addEventListener('click', () => {
-        // Toggle the flipped CSS class
         shirtFlipper.classList.toggle('is-flipped');
-        
-        // Update the state and button text
         isShowingBack = !isShowingBack;
         btnFlip.textContent = isShowingBack ? 'FLIP TO BACK' : 'FLIP TO FRONT';
     });
 
     // Initial scale on load and window resize
     window.addEventListener('load', () => {
-        autoScaleText(nameDisplay, isDesktop() ? 3 : 2);
-        autoScaleText(numberDisplay, isDesktop() ? 8 : 5);
+        autoScaleText(nameDisplay, (isDesktop() ? 3 : 2) * currentFontScale);
+        autoScaleText(numberDisplay, (isDesktop() ? 8 : 5) * currentFontScale);
     });
     window.addEventListener('resize', () => {
-        autoScaleText(nameDisplay, isDesktop() ? 3 : 2);
-        autoScaleText(numberDisplay, isDesktop() ? 8 : 5);
+        autoScaleText(nameDisplay, (isDesktop() ? 3 : 2) * currentFontScale);
+        autoScaleText(numberDisplay, (isDesktop() ? 8 : 5) * currentFontScale);
     });
 
 });
