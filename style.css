@@ -218,6 +218,7 @@ input[type="text"] {
     border-radius: 4px;
 }
 
+
 .action-buttons button {
     flex: 1;
     height: 50px;
@@ -286,5 +287,33 @@ input[type="text"] {
         justify-content: space-between;
         display: flex;
         flex-direction: column;
+    }
+}
+
+/* =========================================
+   1. MOBILE RESPONSIVENESS FIXES
+   ========================================= */
+@media (max-width: 767px) {
+    .main-container {
+        height: auto; /* Allows natural scrolling on mobile */
+    }
+    .left-col {
+        min-height: 480px; /* Ensures the jersey has enough height to render */
+        padding-bottom: 0;
+    }
+    .display-stage {
+        margin-bottom: 0; /* Removes the desktop negative margin */
+        background-size: 95%; /* Fits the light podium better on small screens */
+    }
+    .flip-container {
+        height: 350px; /* Gives the 3D jersey a stable height on mobile */
+        margin-bottom: 40px; 
+    }
+    .right-col {
+        padding-top: 10px; /* Brings the form container closer to the jersey */
+    }
+    .shirt-qr {
+        width: 45px; /* Scales down the QR slightly so it doesn't overlap text */
+        margin: 25px -20px 0;
     }
 }
