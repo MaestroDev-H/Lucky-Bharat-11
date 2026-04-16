@@ -97,7 +97,7 @@ document.addEventListener('DOMContentLoaded', () => {
         'MONTSERRAT': {
             family: "'Montserrat', sans-serif",
             letterSpacing: '0px',
-            numberMargin: '-20px',
+            numberMargin: '-10px',
             sizeMultiplier: 1.0
         },
         'IMPACT': {
