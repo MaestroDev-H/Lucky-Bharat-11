@@ -30,9 +30,6 @@ document.addEventListener('DOMContentLoaded', () => {
         autoScaleText(nameDisplay, (isDesktop() ? 3 : 2) * currentFontScale); 
     });
 
-    
-
-
     // --- 2. Update Player Number ---
     const btnMinus = document.querySelectorAll('.btn-step')[0];
     const btnPlus = document.querySelectorAll('.btn-step')[1];
@@ -156,11 +153,9 @@ document.addEventListener('DOMContentLoaded', () => {
         autoScaleText(numberDisplay, (isDesktop() ? 8 : 5) * currentFontScale);
     });
 
-});
-
 // =========================================
-    // NEW: SAVE MODAL & ZIP EXPORT LOGIC
-    // =========================================
+// NEW: SAVE MODAL & ZIP EXPORT LOGIC
+// =========================================
     const btnSaveDesign = document.querySelector('.btn-save');
     const saveModal = document.getElementById('save-modal');
     const btnEditDesign = document.getElementById('btn-edit-design');
@@ -182,26 +177,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const nameText = document.querySelector('.player-name-display');
         const numText = document.querySelector('.player-number-display');
 
-        // --- NEW FEATURE: DYNAMICALLY ADD LOGO TO BACK BEFORE EXPORT ---
-        const backLogo = document.createElement('img');
-        backLogo.src = './image/logo.png'; // Edit this if your logo name changes
-        backLogo.style.position = 'absolute';
-        backLogo.style.top = '40px'; 
-        backLogo.style.left = '50%';
-        backLogo.style.transform = 'translateX(-50%)';
-        backLogo.style.width = '50px'; 
-        backLogo.style.zIndex = '99';
-
         try {
-            await new Promise((resolve) => {
-                backLogo.onload = resolve;
-                backLogo.onerror = () => {
-                    console.warn("Logo image failed to load. Check path.");
-                    resolve(); 
-                };
-                shirtBackEl.appendChild(backLogo);
-            });
-
             shirtFrontEl.style.transform = 'rotateY(0deg)';
 
             nameText.style.background = 'none';
@@ -240,10 +216,6 @@ document.addEventListener('DOMContentLoaded', () => {
             numText.style.webkitBackgroundClip = '';
             numText.style.color = '';
             numText.style.filter = '';
-
-            if (shirtBackEl.contains(backLogo)) {
-                shirtBackEl.removeChild(backLogo);
-            }
 
             saveModal.style.display = 'flex';
         } catch (error) {
@@ -293,3 +265,4 @@ document.addEventListener('DOMContentLoaded', () => {
             btnConfirmSave.disabled = false;
         }
     });
+});
