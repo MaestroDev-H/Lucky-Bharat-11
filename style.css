@@ -343,8 +343,13 @@ input[type="text"] {
         margin: 0 auto;       /* Centers the container */
         background-size: 100% 100%; /* Forces the background image to fit the box exactly */
     }
-
+.logo {
+    width: 30px;
+    margin-top: -50px;
+    margin-bottom: 50px;
 }
+}
+
 
 /* =========================================
    NEW: SAVE MODAL STYLES
