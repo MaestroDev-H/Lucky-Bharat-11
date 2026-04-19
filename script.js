@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     nameInput.addEventListener('input', (e) => {
         const newName = e.target.value.trim().toUpperCase();
-        nameDisplay.textContent = newName || 'RAHEL'; 
+        nameDisplay.textContent = newName || 'Koie'; 
         // Apply the scale modifier to the base size
         autoScaleText(nameDisplay, (isDesktop() ? 3 : 2) * currentFontScale); 
     });
@@ -79,6 +79,7 @@ document.addEventListener('DOMContentLoaded', () => {
         'ANTON': {
             family: "'Anton', sans-serif",
             letterSpacing: '1px',
+          
             numberMargin: '0px',
             sizeMultiplier: 0.9 // <--- CHANGE THIS: 0.9 makes Anton 10% smaller!
         },
@@ -156,3 +157,139 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
 });
+
+// =========================================
+    // NEW: SAVE MODAL & ZIP EXPORT LOGIC
+    // =========================================
+    const btnSaveDesign = document.querySelector('.btn-save');
+    const saveModal = document.getElementById('save-modal');
+    const btnEditDesign = document.getElementById('btn-edit-design');
+    const btnConfirmSave = document.getElementById('btn-confirm-save');
+    const previewFront = document.getElementById('preview-front');
+    const previewBack = document.getElementById('preview-back');
+
+    let frontImageData = null;
+    let backPrintData = null; // High-res transparent version for ZIP
+
+    // 1. SAVE DESIGN BUTTON (Opens Modal & Generates Previews)
+    btnSaveDesign.addEventListener('click', async (e) => {
+        e.preventDefault();
+        btnSaveDesign.style.opacity = '0.5';
+        btnSaveDesign.disabled = true;
+
+        const shirtFrontEl = document.querySelector('.shirt-front');
+        const shirtBackEl = document.querySelector('.shirt-back');
+        const nameText = document.querySelector('.player-name-display');
+        const numText = document.querySelector('.player-number-display');
+
+        // --- NEW FEATURE: DYNAMICALLY ADD LOGO TO BACK BEFORE EXPORT ---
+        const backLogo = document.createElement('img');
+        backLogo.src = './image/logo.png'; // Edit this if your logo name changes
+        backLogo.style.position = 'absolute';
+        backLogo.style.top = '40px'; 
+        backLogo.style.left = '50%';
+        backLogo.style.transform = 'translateX(-50%)';
+        backLogo.style.width = '50px'; 
+        backLogo.style.zIndex = '99';
+
+        try {
+            await new Promise((resolve) => {
+                backLogo.onload = resolve;
+                backLogo.onerror = () => {
+                    console.warn("Logo image failed to load. Check path.");
+                    resolve(); 
+                };
+                shirtBackEl.appendChild(backLogo);
+            });
+
+            shirtFrontEl.style.transform = 'rotateY(0deg)';
+
+            nameText.style.background = 'none';
+            nameText.style.webkitBackgroundClip = 'initial';
+            nameText.style.color = '#fcd784';
+            nameText.style.filter = 'none';
+
+            numText.style.background = 'none';
+            numText.style.webkitBackgroundClip = 'initial';
+            numText.style.color = '#fcd784';
+            numText.style.filter = 'none';
+
+            const canvasFront = await html2canvas(shirtFrontEl, { backgroundColor: null, scale: 2 });
+            frontImageData = canvasFront.toDataURL('image/png');
+            previewFront.src = frontImageData;
+
+            const canvasBackUI = await html2canvas(shirtBackEl, { backgroundColor: null, scale: 2 });
+            previewBack.src = canvasBackUI.toDataURL('image/png');
+
+            shirtBackEl.style.backgroundImage = 'none'; 
+            shirtBackEl.style.backgroundColor = 'transparent'; 
+            
+            const canvasBackPrint = await html2canvas(shirtBackEl, { backgroundColor: null, scale: 4 }); 
+            backPrintData = canvasBackPrint.toDataURL('image/png');
+            
+            // --- RESTORE ---
+            shirtBackEl.style.backgroundImage = ''; 
+            shirtFrontEl.style.transform = ''; 
+
+            nameText.style.background = '';
+            nameText.style.webkitBackgroundClip = '';
+            nameText.style.color = '';
+            nameText.style.filter = '';
+
+            numText.style.background = '';
+            numText.style.webkitBackgroundClip = '';
+            numText.style.color = '';
+            numText.style.filter = '';
+
+            if (shirtBackEl.contains(backLogo)) {
+                shirtBackEl.removeChild(backLogo);
+            }
+
+            saveModal.style.display = 'flex';
+        } catch (error) {
+            console.error("Error generating design previews:", error);
+            alert("Something went wrong generating the design. Ensure you are running this on a local web server.");
+        } finally {
+            btnSaveDesign.style.opacity = '1';
+            btnSaveDesign.disabled = false;
+        }
+    });
+
+    // 2. EDIT DESIGN BUTTON (Closes Modal)
+    btnEditDesign.addEventListener('click', () => {
+        saveModal.style.display = 'none';
+    });
+
+    // 3. CONFIRM PRINT BUTTON (Downloads ZIP)
+    btnConfirmSave.addEventListener('click', () => {
+        btnConfirmSave.style.opacity = '0.5';
+        btnConfirmSave.disabled = true;
+
+        try {
+            const zip = new JSZip();
+            
+            const frontBase64 = frontImageData.split(',')[1];
+            const backBase64 = backPrintData.split(',')[1];
+
+            zip.file("Jersey_Front_Design.png", frontBase64, {base64: true});
+            zip.file("Jersey_Back_Print_File_Transparent.png", backBase64, {base64: true});
+
+            // --- NEW: GET PLAYER NAME FOR ZIP FILENAME ---
+            const playerName = document.querySelector('.player-name-display').textContent.trim() || 'Custom';
+            // Clean the name so weird characters don't break the computer's file saving
+            const safeName = playerName.replace(/[^a-zA-Z0-9]/g, '_'); 
+
+            zip.generateAsync({type:"blob"}).then(function(content) {
+                // Dynamically inject the name into the ZIP file name!
+                saveAs(content, `${safeName}_Jersey.zip`);
+                
+                btnConfirmSave.style.opacity = '1';
+                btnConfirmSave.disabled = false;
+                saveModal.style.display = 'none';
+            });
+        } catch(error) {
+            console.error("Error creating ZIP:", error);
+            btnConfirmSave.style.opacity = '1';
+            btnConfirmSave.disabled = false;
+        }
+    });

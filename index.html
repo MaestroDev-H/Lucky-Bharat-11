@@ -31,7 +31,7 @@
                 <div class="flip-container" id="shirt-flipper">
                     
                     <div class="shirt-face shirt-back">
-                        <h2 class="player-name-display">RAHEL</h2>
+                        <h2 class="player-name-display">KOIE</h2>
                         <h1 class="player-number-display">7</h1>
                         <img src="./image/qr.png" alt="QR Code" class="shirt-qr">
                         <p class="promo-text">SCAN. PLAY & WIN</p>
@@ -104,8 +104,40 @@
 
     </div>
 </section>
-    </main>
-    <script src="script.js"></script>
+   </main>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+
+    <div id="save-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-container form-container">
+            <div class="header">
+                <h1 class="gradient-title">
+                    <span class="silver-text">REVIEW</span> 
+                    <span class="gold-text">DESIGN</span>
+                </h1>
+                <hr class="divider">
+            </div>
+
+            <div class="modal-previews">
+                <div class="preview-box">
+                    <label class="preview-label">FRONT</label>
+                    <img id="preview-front" src="" alt="Front Preview">
+                </div>
+                <div class="preview-box">
+                    <label class="preview-label">BACK</label>
+                    <img id="preview-back" src="" alt="Back Preview">
+                </div>
+            </div>
+
+            <div class="action-buttons modal-actions">
+                <button id="btn-edit-design" class="btn-option" style="font-size: 1rem;">EDIT DESIGN</button>
+                <button id="btn-confirm-save" class="btn-save" style="font-size: 1rem;">CONFIRM PRINT ></button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
 </body>
 </html>
