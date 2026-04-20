@@ -164,7 +164,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const previewBack = document.getElementById('preview-back');
 
     let frontImageData = null;
-    let backPrintData = null; // High-res transparent version for ZIP
+    let frontPrintData = null; // High-res transparent version for front
+    let backPrintData = null;  // High-res transparent version for back
 
     // 1. SAVE DESIGN BUTTON (Opens Modal & Generates Previews)
     btnSaveDesign.addEventListener('click', async (e) => {
@@ -178,7 +179,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const numText = document.querySelector('.player-number-display');
 
         try {
-            shirtFrontEl.style.transform = 'rotateY(0deg)';
+            // --- 1. PREPARE FRONT CAPTURE ---
+            shirtBackEl.style.visibility = 'hidden'; // Hide the back so it doesn't bleed through
+            shirtFrontEl.style.transform = 'rotateY(0deg)'; // Un-flip the front
 
             nameText.style.background = 'none';
             nameText.style.webkitBackgroundClip = 'initial';
@@ -190,20 +193,36 @@ document.addEventListener('DOMContentLoaded', () => {
             numText.style.color = '#fcd784';
             numText.style.filter = 'none';
 
+            // Generate Front Preview 
             const canvasFront = await html2canvas(shirtFrontEl, { backgroundColor: null, scale: 2 });
             frontImageData = canvasFront.toDataURL('image/png');
             previewFront.src = frontImageData;
 
+            // Generate Front Print 
+            shirtFrontEl.style.backgroundImage = 'none';
+            shirtFrontEl.style.backgroundColor = 'transparent';
+            const canvasFrontPrint = await html2canvas(shirtFrontEl, { backgroundColor: null, scale: 4 });
+            frontPrintData = canvasFrontPrint.toDataURL('image/png');
+
+            // --- 2. PREPARE BACK CAPTURE ---
+            shirtFrontEl.style.visibility = 'hidden'; // Hide the front now
+            shirtBackEl.style.visibility = 'visible'; // Bring the back into view
+            
+            // Generate Back Preview 
             const canvasBackUI = await html2canvas(shirtBackEl, { backgroundColor: null, scale: 2 });
             previewBack.src = canvasBackUI.toDataURL('image/png');
 
+            // Generate Back Print 
             shirtBackEl.style.backgroundImage = 'none'; 
             shirtBackEl.style.backgroundColor = 'transparent'; 
-            
             const canvasBackPrint = await html2canvas(shirtBackEl, { backgroundColor: null, scale: 4 }); 
             backPrintData = canvasBackPrint.toDataURL('image/png');
             
-            // --- RESTORE ---
+            // --- 3. RESTORE EVERYTHING ---
+            shirtFrontEl.style.visibility = ''; // Restore front visibility
+            shirtBackEl.style.visibility = '';  // Restore back visibility
+            
+            shirtFrontEl.style.backgroundImage = ''; 
             shirtBackEl.style.backgroundImage = ''; 
             shirtFrontEl.style.transform = ''; 
 
@@ -240,10 +259,10 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const zip = new JSZip();
             
-            const frontBase64 = frontImageData.split(',')[1];
+            const frontBase64 = frontPrintData.split(',')[1];
             const backBase64 = backPrintData.split(',')[1];
 
-            zip.file("Jersey_Front_Design.png", frontBase64, {base64: true});
+            zip.file("Jersey_Front_Print_File_Transparent.png", frontBase64, {base64: true});
             zip.file("Jersey_Back_Print_File_Transparent.png", backBase64, {base64: true});
 
             // --- NEW: GET PLAYER NAME FOR ZIP FILENAME ---
@@ -265,4 +284,4 @@ document.addEventListener('DOMContentLoaded', () => {
             btnConfirmSave.disabled = false;
         }
     });
-});
+}); 
