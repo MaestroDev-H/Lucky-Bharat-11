@@ -140,7 +140,9 @@ document.addEventListener('DOMContentLoaded', () => {
     btnFlip.addEventListener('click', () => {
         shirtFlipper.classList.toggle('is-flipped');
         isShowingBack = !isShowingBack;
-        btnFlip.textContent = isShowingBack ? 'FLIP TO BACK' : 'FLIP TO FRONT';
+        
+        // CHANGED: Swapped the text order so it says "FLIP TO BACK" when the front is showing
+        btnFlip.textContent = isShowingBack ? 'FLIP TO FRONT' : 'FLIP TO BACK';
     });
 
     // Initial scale on load and window resize
@@ -154,7 +156,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
 // =========================================
-// NEW: SAVE MODAL & ZIP EXPORT LOGIC
+// NEW: SAVE MODAL & PHP EXPORT LOGIC
 // =========================================
     const btnSaveDesign = document.querySelector('.btn-save');
     const saveModal = document.getElementById('save-modal');
@@ -172,6 +174,7 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault();
         btnSaveDesign.style.opacity = '0.5';
         btnSaveDesign.disabled = true;
+        btnSaveDesign.textContent = "GENERATING..."; // Optional feedback
 
         const shirtFrontEl = document.querySelector('.shirt-front');
         const shirtBackEl = document.querySelector('.shirt-back');
@@ -180,8 +183,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         try {
             // --- 1. PREPARE FRONT CAPTURE ---
-            shirtBackEl.style.visibility = 'hidden'; // Hide the back so it doesn't bleed through
-            shirtFrontEl.style.transform = 'rotateY(0deg)'; // Un-flip the front
+            shirtBackEl.style.visibility = 'hidden'; 
+            shirtFrontEl.style.transform = 'rotateY(0deg)'; 
 
             nameText.style.background = 'none';
             nameText.style.webkitBackgroundClip = 'initial';
@@ -205,8 +208,8 @@ document.addEventListener('DOMContentLoaded', () => {
             frontPrintData = canvasFrontPrint.toDataURL('image/png');
 
             // --- 2. PREPARE BACK CAPTURE ---
-            shirtFrontEl.style.visibility = 'hidden'; // Hide the front now
-            shirtBackEl.style.visibility = 'visible'; // Bring the back into view
+            shirtFrontEl.style.visibility = 'hidden'; 
+            shirtBackEl.style.visibility = 'visible'; 
             
             // Generate Back Preview 
             const canvasBackUI = await html2canvas(shirtBackEl, { backgroundColor: null, scale: 2 });
@@ -219,8 +222,8 @@ document.addEventListener('DOMContentLoaded', () => {
             backPrintData = canvasBackPrint.toDataURL('image/png');
             
             // --- 3. RESTORE EVERYTHING ---
-            shirtFrontEl.style.visibility = ''; // Restore front visibility
-            shirtBackEl.style.visibility = '';  // Restore back visibility
+            shirtFrontEl.style.visibility = ''; 
+            shirtBackEl.style.visibility = '';  
             
             shirtFrontEl.style.backgroundImage = ''; 
             shirtBackEl.style.backgroundImage = ''; 
@@ -239,10 +242,11 @@ document.addEventListener('DOMContentLoaded', () => {
             saveModal.style.display = 'flex';
         } catch (error) {
             console.error("Error generating design previews:", error);
-            alert("Something went wrong generating the design. Ensure you are running this on a local web server.");
+            alert("Something went wrong generating the design.");
         } finally {
             btnSaveDesign.style.opacity = '1';
             btnSaveDesign.disabled = false;
+            btnSaveDesign.textContent = "SAVE DESIGN";
         }
     });
 
@@ -251,37 +255,44 @@ document.addEventListener('DOMContentLoaded', () => {
         saveModal.style.display = 'none';
     });
 
-    // 3. CONFIRM PRINT BUTTON (Downloads ZIP)
-    btnConfirmSave.addEventListener('click', () => {
+    // 3. CONFIRM PRINT BUTTON (Sends to PHP)
+    btnConfirmSave.addEventListener('click', async () => {
         btnConfirmSave.style.opacity = '0.5';
         btnConfirmSave.disabled = true;
+        btnConfirmSave.textContent = "SAVING..."; // Visual feedback for user
+
+        const playerName = document.querySelector('.player-name-display').textContent.trim() || 'Custom';
 
         try {
-            const zip = new JSZip();
-            
-            const frontBase64 = frontPrintData.split(',')[1];
-            const backBase64 = backPrintData.split(',')[1];
-
-            zip.file("Jersey_Front_Print_File_Transparent.png", frontBase64, {base64: true});
-            zip.file("Jersey_Back_Print_File_Transparent.png", backBase64, {base64: true});
-
-            // --- NEW: GET PLAYER NAME FOR ZIP FILENAME ---
-            const playerName = document.querySelector('.player-name-display').textContent.trim() || 'Custom';
-            // Clean the name so weird characters don't break the computer's file saving
-            const safeName = playerName.replace(/[^a-zA-Z0-9]/g, '_'); 
-
-            zip.generateAsync({type:"blob"}).then(function(content) {
-                // Dynamically inject the name into the ZIP file name!
-                saveAs(content, `${safeName}_Jersey.zip`);
-                
-                btnConfirmSave.style.opacity = '1';
-                btnConfirmSave.disabled = false;
-                saveModal.style.display = 'none';
+            // Send the Base64 data to our PHP script using Fetch API
+            const response = await fetch('save_design.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    frontImage: frontPrintData,
+                    backImage: backPrintData,
+                    playerName: playerName
+                })
             });
-        } catch(error) {
-            console.error("Error creating ZIP:", error);
+
+            const result = await response.json();
+
+            if (response.ok) {
+                alert(result.message); // Show success message
+                saveModal.style.display = 'none'; // Close modal
+            } else {
+                alert("Error: " + result.message);
+            }
+
+        } catch (error) {
+            console.error("Error sending data to server:", error);
+            alert("Network error. Make sure you are running this on a PHP server.");
+        } finally {
             btnConfirmSave.style.opacity = '1';
             btnConfirmSave.disabled = false;
+            btnConfirmSave.textContent = "CONFIRM PRINT >";
         }
     });
-}); 
+});
